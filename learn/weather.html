@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气预报</title>
+    <base href='https://xinetzone.github.io/'>
+    <script type='module' src="./xinet-js/home.js" async></script>
+</head>
+
+<body>
+    <page-header></page-header>
+    <p>
+        参考 <a href="https://cj.weather.com.cn/plugin/index">中国天气插件</a>
+    </p>
+    <h2>H5 插件</h2>
+    <iframe title="H5 插件" width="400" height="800"
+            src="https://apip.weatherdt.com/v2/h5.html?bg=1&md=02345&lc=auto&key=FQdSJN25pY"></iframe>
+
+    <h2>网页简约插件</h2>
+
+    <div id="weather-v2-plugin-simple"></div>
+    <script>
+        WIDGET = {
+            CONFIG: {
+                "modules": "01234",
+                "background": 1,
+                "tmpColor": "FFFFFF",
+                "tmpSize": 16,
+                "cityColor": "FFFFFF",
+                "citySize": 16,
+                "aqiSize": 16,
+                "weatherIconSize": 24,
+                "alertIconSize": 18,
+                "padding": "10px 10px 10px 10px",
+                "shadow": "1",
+                "language": "auto",
+                "borderRadius": 5,
+                "fixed": "false",
+                "vertical": "middle",
+                "horizontal": "center",
+                "key": "ILPrYbzT1R"
+            }
+        }
+    </script>
+    <script src="https://apip.weatherdt.com/simple/static/js/weather-simple-common.js?v=2.0"></script>
+
+    <h2>创建网页标准天气插件</h2>
+
+    <div id="weather-v2-plugin-standard"></div>
+    <script>
+        WIDGET = {
+            CONFIG: {
+                "layout": 1, // 1 表示横版， 2 表示竖版
+                "width": "450",
+                "height": "160",
+                "background": 1,
+                "dataColor": "FFFFFF",
+                "borderRadius": 5,
+                "key": "BnDBk1tjsN"
+            }
+        }
+    </script>
+    <script src="https://apip.weatherdt.com/standard/static/js/weather-standard-common.js?v=2.0" async></script>
+
+    <h2>获取地理位置</h2>
+    <iframe id="inlineFrameExample" title="Inline Frame Example" width="300" height="200"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik">
+    </iframe>
+</body>
+
+</html>

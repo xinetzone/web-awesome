@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web 组件（component）是制作自包含（self-contained）组件的一组标准：具有其自身属性和方法，
+        被封装的 DOM 和样式的自定义 HTML 元素。</title>
+    <base href='https://xinetzone.github.io/'>
+    <script type='module' src="xinet-js/home.js" async></script>
+</head>
+
+<body class="w3-pale-yellow">
+    <page-header></page-header>
+    <header class="w3-container w3-light-blue w3-center">
+        <h1><b>Web components 教程</b></h1>
+        <p>欢迎来到<span class="w3-tag">Web Components</span>博客</p>
+    </header>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <section>
+            <h2 class="w3-center">没有特性的 HTML 元素</h2>
+            <p>
+                一般常使用标准的 HTML 元素，如：<inline-code>&lt;p>欢迎进入我的博客&lt;/p></inline-code>
+                组织 DOM。
+                其实，可以使用自定义的 HTML 元素，
+                比如：<inline-code>&lt;greeting>欢迎进入我的博客&lt;/greeting></inline-code>
+                可以在浏览器正常显示：
+            </p>
+            <iframe class="w3-white" src="web-examples/simple/greeting_no.html" title="欢迎页面" width="325" height="70"></iframe>
+
+            <p>
+                这里 <inline-code>&lt;greeting></inline-code> 便是
+                非标准的 HTML 元素。可以添加自定义样式：
+            </p>
+            <pre is='block-code' contenteditable="false">
+                <code class="language-html">
+                    &lt;style>
+                    greeting {
+                        display: block;
+                        font-size: 36px;
+                        color: red;
+                    }
+                    &lt;/style>
+                </code>
+            </pre>
+            <p>
+                运行结果如下：
+            </p>
+            <iframe class="w3-white" src="web-examples/simple/greeting.html" title="欢迎页面" width="325" height="70"></iframe>
+        </section>
+
+        <section>
+            <p>接着，使用脚本操作这个元素：</p>
+            <pre is='block-code' contenteditable="false">
+                <code class="language-html">
+                    &lt;script>
+                        'use strict'
+                        let elements = document.querySelectorAll('greeting')
+                        greeting_elem = elements[0]
+                        greeting_elem.innerText = '你好，世界'
+                    &lt;/script>
+                </code>
+                </pre>
+
+            <p>
+                运行结果如下：
+            </p>
+            <iframe class="w3-white" src="web-examples/simple/greeting_js.html" title="欢迎页面" width="325" height="70"></iframe>
+            <p>
+                此例子说明，浏览器对待自定义元素，就像对待标准元素一样，只是没有默认的样式和行为。换言之，浏览器必须将自定义元素保留在 DOM 之中，但不会有任何语义信息和附加属性。除此之外，自定义元素与标准元素是一样的。
+            </p>
+            <p>
+                其实，所有的自定义元素都是<inline-code>HTMLUnknownElement</inline-code>
+                对象的实例。
+            </p>
+            <iframe class="live-sample-frame inheritance-diagram-frame" frameborder="0" height="120"
+                    id="frame_inheritance_diagram"
+                    src="https://mdn.mozillademos.org/en-US/docs/Web/API/HTMLUnknownElement$samples/inheritance_diagram?revision=1512143"
+                    width="600">
+            </iframe>
+        </section>
+    </article>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">标准 custom elements</h2>
+        <section class="w3-card-section w3-yellow" style="max-width:75%">
+            <p>
+                为了让自定义的 HTML 元素支持一些 HTML 的内置属性，custom element 名称必须包括至少一个短横线 <inline-code>-</inline-code>，比如
+                <inline-code>my-element</inline-code> 和
+                <inline-code>super-button</inline-code>
+                都是有效的元素名，但
+                <inline-code>myelement</inline-code> 并不是。
+                这是为了确保 custom element 和内置 HTML 元素之间不会发生命名冲突。
+            </p>
+        </section>
+
+        <section>
+            <p>
+                此时自定义元素就不是<inline-code>HTMLUnknownElement</inline-code>
+                的实例了，而是<inline-code>HTMLElement</inline-code> 的实例。
+            </p>
+
+            <pre is='block-code' contenteditable="false">
+                <code class="language-html">
+                    &lt;script>
+                        'use strict'
+                        let helloWorld = document.createElement('hello-world')
+                        helloWorld instanceof HTMLUnknownElement // 输出 false
+                        helloWorld instanceof HTMLElement // 输出 true
+                    &lt;/script>
+                </code>
+            </pre>
+
+            <p>
+                注意这里的<inline-code>
+                    let helloWorld = document.createElement('hello-world')</inline-code>
+                等价于在 HTML 中的<inline-code>
+                    &lt;hello-world>&lt;/hello-world></inline-code>
+            </p>
+            <p>
+                换言之，<inline-code>
+                    document.createElement</inline-code> 函数用于创建一个由标签名称
+                <inline-code>
+                    tagName</inline-code> 指定的 HTML 元素。
+            </p>
+        </section>
+    </article>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">创建 autonomous custom elements</h2>
+        <p>
+            可以通过 JavaScript 的 <inline-code>class</inline-code> 定义 HTML 的标准自定义元素。
+            比如，可以定义一个带有统一样式的标识代码的 HTML 元素。
+        </p>
+        <pre is='block-code'>
+            <code class="language-javascript">
+                &lt;script>
+                'use strict'
+
+                class InlineCode extends HTMLElement {
+                  constructor() {
+                    super()
+                    this.classList.add('w3-card', 'w3-padding-small', 'w3-round-xxlarge', 'w3-light-gray')
+                  }
+                }
+                
+                customElements.define("inline-code", InlineCode)
+                &lt;/script>
+            </code>
+        </pre>
+
+        <p>
+            这样，便可以在 HTML 中以如，<inline-code>&lt;inline-code>Alt&lt;/inline-code></inline-code> 的方式使用自定义元素。
+            这种方式的自定义元素被称为<strong>自主定制元素</strong>（Autonomous custom element）。
+        </p>
+
+        <p class="w3-card-section w3-yellow" style="max-width:75%">
+            注意：自主自定义元素的构造函数必须扩展 <inline-code>HTMLElement</inline-code>。
+        </p>
+    </article>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">创建 customized built-in elements</h2>
+        <p>
+            Customized built-in elements 继承自内置的或者已有的 HTML 元素。在创建时，你必须指定所需扩展的元素，
+            使用时，需要先写出基本的元素标签，并通过 <inline-code>is</inline-code> 属性指定 custom element 的名称。
+            例如 <inline-code>&lt;p is="word-count"></inline-code>。
+        </p>
+
+        <p>
+            更加详细的是如下例子：
+        </p>
+
+        <pre is='block-code'>
+            <code class="language-javascript">
+                'use strict'
+
+                class BlockCode extends HTMLPreElement {
+                    constructor() {
+                        super()
+                        this.classList.add('w3-card', 'w3-code', 'w3-pale-green',
+                        'w3-padding-small', 'w3-round-xlarge', 'w3-text-purple')
+                    }
+                }
+
+                customElements.define("block-code", BlockCode, {extends: 'pre'})
+            </code>
+        </pre>
+
+        <p>
+            在 HTML 中便可像下面的方式定义代码块：
+        </p>
+
+        <pre is='block-code'>
+            <code>
+                &lt;pre is='block-code'>
+                    &lt;code>
+                        ...
+                    &lt;/code>
+                &lt;/pre>
+            </code>
+        </pre>
+    </article>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">
+            创建 shadow DOM
+        </h2>
+        <p>
+            web components 的应该重要的特性就是封装：可以将 HTML 元素，样式和行为隐藏，并与其他代码项隔离。实现该特性的手段就是 shadow DOM。
+        </p>
+        <pre is='block-code'>
+            <code>
+                // 为新元素创建一个类
+                class WordCount extends HTMLParagraphElement {
+                    constructor() {
+                        // 在构造器中先调用一下 super
+                        super()
+                        // 创建一个 shadow root
+                        const shadow = this.attachShadow({ mode: 'open' })
+                        //创建文本节点并向其添加计数器
+                        this.text = document.createElement('span')
+                        this.updateCount()
+                        //将其添加到shadow root上
+                        shadow.appendChild(this.text)
+                        //当元素内容发生变化时更新计数
+                        setInterval(this.updateCount, 200)
+                    }
+
+                    countWords(node) { // 统计英文单词数目
+                        const text = node.innerText || node.textContent
+                        return text.split(/\s+/g).length
+                    }
+
+                    updateCount() {
+                        // 单词计数器指向元素的父级
+                        const wcParent = this.parentNode
+                        const count = `Words: ${this.countWords(wcParent)}`
+                        this.text.textContent = count
+                    }
+                }
+
+                // 定义新元素
+                customElements.define('word-count', WordCount, { extends: 'p' })
+            </code>
+        </pre>
+        <p>
+            只需要在你需要统计的 HTML 元素中嵌入 <inline-code>&lt;p is="word-count">&lt;/p></inline-code> 即可统计该元素内的空白符格式。
+        </p>
+    </article>
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">
+            使用 <inline-code>&lt;template></inline-code>
+        </h2>
+        <p>
+            下面以创建一个用户卡片为例介绍如何使用 <inline-code>&lt;template></inline-code> 保存一份可复用的 HTML 元素。首先，在
+            HTML 中创建一个模板：
+        </p>
+
+        <pre is='block-code'>
+            <code>
+                &lt;template class="userCardTemplate">
+                    &lt;!-- 引入外部 CSS --&gt;
+                    &lt;link rel='stylesheet' href="styles/user-card.css">
+                    &lt;!-- 定义图片 --&gt;
+                    &lt;img class="image" alt="user card">
+                    &lt;div class="container">
+                        &lt;!-- 定义用户基本信息 --&gt;
+                        &lt;p class="name">&lt;/p>
+                        &lt;p class="email">&lt;/p>
+                        &lt;button class="button">Follow John&lt;/button>
+                    &lt;/div>
+                &lt;/template>
+            </code>
+        </pre>
+
+        <p>
+            接着，使用 JavaScript 创建 HTML 自定义元素：
+        </p>
+
+        <pre is='block-code'>
+            <code>
+                class UserCard extends HTMLElement {
+                    constructor() {
+                      super()
+                      let shadow = this.attachShadow({ mode: 'open' })
+                      let templateElem = document.querySelector('.userCardTemplate')
+                      let content = templateElem.content.cloneNode(true)
+                      content.querySelector('img').setAttribute('src', this.getAttribute('image'))
+                      content.querySelector('.container>.name').innerText = this.getAttribute('name')
+                      content.querySelector('.container>.email').innerText = this.getAttribute('email')
+                      shadow.appendChild(content)
+                    }
+                  }
+                  
+                customElements.define("user-card", UserCard)
+            </code>
+        </pre>
+
+        <p>然后，便可以在 HTML 自如的使用该元素：</p>
+
+        <pre is='block-code'>
+            <code>
+                &lt;user-card image="your-card.png" name="User Name" email="yourmail@some-email.com">
+                &lt;/user-card>
+        </user-card>
+            </code>
+        </pre>
+
+        <p>
+            可以看到使用 <inline-code>&lt;template></inline-code> 极大的简化了代码。
+        </p>
+
+    </article>
+
+    <article class="w3-content w3-light-grey w3-padding w3-round-xxlarge">
+        <h2 class="w3-center">
+            使用 <inline-code>&lt;slot></inline-code>
+        </h2>
+
+        <p>
+            虽然 <inline-code>&lt;template></inline-code> 已经为我们带来了便利，但是还是不够友好，下面我们使用 <inline-code>&lt;slot></inline-code> 作为一个占位符，重新定义用户卡片模板：
+        </p>
+        <pre is="block-code">
+            <code>
+                &lt;template class="userCardTemplate">
+                    &lt;link rel='stylesheet' href="styles/user-card.css">
+                    &lt;img class="image" alt="user card">
+                    &lt;div class="container">
+                        &lt;p>&lt;slot name='name'>User Name&lt;/slot></p>
+                        &lt;p>&lt;slot name='email'>yourmail@some-email.com&lt;/slot></p>
+                        &lt;button class="button">Follow John&lt;/button>
+                    &lt;/div>
+                &lt;/template>
+            </code>
+        </pre>
+        <p>
+            这时，JavaScript 便可以这样：
+        </p>
+        <pre is='block-code'>
+            <code>
+                class UserCard extends HTMLElement {
+                    constructor() {
+                      super()
+                      let shadow = this.attachShadow({ mode: 'open' })
+                      let templateElem = document.querySelector('.userCardTemplate')
+                      let content = templateElem.content.cloneNode(true)
+                      content.querySelector('img').setAttribute('src', this.getAttribute('image'))
+                      shadow.appendChild(content)
+                    }
+                  }
+                  
+                  customElements.define("user-card", UserCard)
+            </code>
+        </pre>
+
+        <p>
+            而在 HTML 中将会更加灵活使用此元素：
+        </p>
+
+        <pre is='block-code'>
+            <code>
+                &lt;user-card image="your-card.png">
+                    &lt;ul slot='name'>
+                        &lt;li>Tom&lt;/li>
+                        &lt;li>Peter&lt;/li>
+                    &lt;/ul>
+                    &lt;p slot='email'>xi@qq.com&lt;/p>
+                &lt;/user-card>
+            </code>
+        </pre>
+    </article>
+
+</body>
+
+</html>
